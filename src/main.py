@@ -1,8 +1,12 @@
 # On importe les fonctions et la fonction time que nous allons utiliser pour notre menu
 import functions
 import time
+import os
+cleaned_directory = 'C:/Users/antpe/OneDrive/Documents/GitHub/chatbot/src/cleaned'
 
-# Le menu utilisateur
+#|-----------------------------------------|
+#|       MENU UTILISATEUR                 |
+#|----------------------------------------|
 def afficher_menu():
     print("|----------------|")
     print("|    ChatBot     |")
@@ -15,7 +19,8 @@ def afficher_menu():
     print("""4. Afficher les noms des présidents qui ont parlé de la "Nation" et de celui qui l'a répété le plus de fois""")
     print("5. Affiche le premier président à parler du climat et de l'écologie")
     print("6. Affiche les mots que tous les présidents ont évoqués")
-    print("7. Quitter")
+    print("7. Posez une question à notre ChaBot")
+    print("8. Quitter")
 
 
 def option1():
@@ -54,7 +59,12 @@ def option6():
     least_important_words = functions.find_least_important_words(tf_idf_matrix)
     common_words = functions.find_common_words_among_all_presidents(tf_idf_matrix, least_important_words)
     print(f"Les mots mentionnés par tous les présidents sont : {common_words}")
-
+def option7():
+    question_user = input("Posez votre question: ")
+    cleaned_directory = 'C:/Users/antpe/OneDrive/Documents/GitHub/chatbot/src/cleaned'
+    idf_scores = functions.idf(cleaned_directory)
+    reponse = functions.chatbot_reponse(question_user, cleaned_directory, idf_scores)
+    print(reponse)
 
 # Permet d'afficher une animation de chargement
 def afficher_animation():
@@ -86,6 +96,8 @@ def menu():
         elif choix == '6':
             option6()
         elif choix == '7':
+            option7()
+        elif choix == '8':
             print("\nAu revoir !")
             break  # Permet d'arreter le système
         else:
@@ -95,6 +107,10 @@ def menu():
 
 
 menu()
+
+#|-----------------------------------------|
+#|       NOS FONCTIONS TESTS              |
+#|----------------------------------------|
 
 '''extraire_nom = functions.extraction()
 print(extraire_nom)
@@ -129,4 +145,63 @@ print("le score est de :", tfidf)
 
 vocabulary, tf_idf_matrix = functions.build_tf_idf_matrix('cleaned')
 print(tf_idf_matrix)
+
+tokens = functions.tokenize_question("Je suis un ChatBot performant")
+print(tokens)
+
+cleaned_dir = 'C:/Users/antpe\OneDrive\Documents\GitHub\chatbot\src\cleaned'
+question = "Quel est l'impact de la politique environnementale sur l'économie ?"
+common_words = functions.find_question_words_in_corpus(question, cleaned_dir)
+print(common_words)
+
+
+question = "Quel est l'impact de la politique environnementale sur l'économie ?"
+question_tf_idf_vector = functions.compute_question_tf_idf(question, corpus_idf_scores, corpus_unique_words)
+
+# Afficher le vecteur TF-IDF pour la question
+print(question_tf_idf_vector)
+
+
+import os
+filename = 'Nomination_Hollande.txt'
+
+full_path = os.path.join('C:/Users/antpe/OneDrive/Documents/GitHub/chatbot/src/cleaned', filename)
+
+with open(full_path, 'r', encoding='utf-8') as file:
+    content = file.read()
+question = "Quel est l'impact de la politique environnementale sur l'économie ?"
+idf_scores = functions.idf('C:/Users/antpe/OneDrive/Documents/GitHub/chatbot/src/cleaned')
+cleaned_directory = 'C:/Users/antpe/OneDrive/Documents/GitHub/chatbot/src/cleaned'
+question_tf_idf_vector = functions.compute_question_tf_idf(question, idf_scores)
+print(question_tf_idf_vector)
+
+
+
+cleaned_directory = 'C:/Users/antpe/OneDrive/Documents/GitHub/chatbot/src/cleaned'
+# Supposons que la question et les scores IDF sont déjà calculés...
+question = "Quel est l'impact de la politique environnementale sur l'économie ?"
+idf_scores = functions.idf(cleaned_directory)  # Assurez-vous que cette fonction renvoie le dictionnaire IDF correct
+question_tf_idf = functions.compute_question_tf_idf(question, idf_scores)
+
+# Calcul de la similarité...
+vocabulary, tf_idf_matrix = functions.build_tf_idf_matrix(cleaned_directory)
+vecteur_question = functions.calculer_vecteur_tf_idf_question(question, idf_scores, vocabulary)
+scores_similarite = functions.calculer_similarite(tf_idf_matrix, vecteur_question)
+document_pertinent, score_pertinent = functions.document_le_plus_pertinent(scores_similarite)
+
+# Génération de la réponse...
+mot_important = functions.mot_avec_tf_idf_le_plus_eleve(question_tf_idf)
+phrase_contenant_mot_important = functions.premiere_occurrence_du_mot(os.path.join(cleaned_directory, document_pertinent), mot_important)
+
+print(f"Document pertinent: {document_pertinent}")
+print(f"Score de similarité: {score_pertinent}")
+print(f"Mot important: {mot_important}")
+print(f"Phrase contenant le mot important: {phrase_contenant_mot_important}"
+
+
+question = "Peux-tu me dire comment une nation peut-elle prendre soin du climat ?"
+reponse_brute = "qu'il s'agisse de la crise migratoire, du défi climatique, des dérives autoritaires, des excès du capitalisme mondial, et bien sûr du terrorisme ; plus rien désormais ne frappe les uns en épargnant les autres"
+reponse_affinee = functions.affiner_reponse(question, reponse_brute)
+
+print(reponse_affinee)
 '''

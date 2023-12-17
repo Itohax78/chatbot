@@ -5,7 +5,9 @@ import math
 import string
 import collections
 
-
+#|-----------------------------------------|
+#|       PARTIE 1                         |
+#|----------------------------------------|
 
 def list_of_files(directory, extension):
    files_names = []
@@ -186,6 +188,9 @@ def build_tf_idf_matrix(directory):
 
     return vocabulary, tf_idf_matrix
 
+#|-----------------------------------------|
+#|       QUESTIONS PARTIE 1               |
+#|----------------------------------------|
 
 def find_least_important_words(tf_idf_matrix):
     least_important_words = set()  # Utiliser un ensemble pour éviter les doublons
@@ -288,3 +293,193 @@ def find_common_words_among_all_presidents(tf_idf_matrix, least_important_words)
         common_words = common_words.intersection(current_doc_words)
 
     return common_words
+
+
+
+
+#|-----------------------------------------|
+#|                PARTIE 2                |
+#|----------------------------------------|
+def tokenize_question(question_text):
+    # Liste des mots vides
+    stop_words = ['le', 'la', 'les', 'un', 'une', 'de', 'du', 'des', 'et', 'en', 'à', 'pour', 'que', 'qui', 'dans',
+                  'avec',
+                  'sur', 'au', 'par', 'il', 'elle', 'ils', 'elles', 'ce', 'cette', 'ces', 'sa', 'son', 'ses', 'lui',
+                  'leur',
+                  'leurs', 'mais', 'ou', 'où', 'si', 'comme', 'ne', 'se', 'pas', 'plus', 'moins', 'sont', 'être',
+                  'avoir',
+                  'tout', 'très', 'peut', 'aussi', 'faire', 'où', 'quand']
+    # Supprimer la ponctuation et convertir en minuscules
+    question_text = question_text.translate(str.maketrans('', '', string.punctuation)).lower()
+
+    # Tokeniser le texte
+    tokens = question_text.split()
+
+    # Supprimer les mots vides
+    tokens = [word for word in tokens if word not in stop_words]
+
+    return tokens
+
+
+def get_unique_corpus_words(cleaned_dir):
+    unique_words = set()
+    for filename in os.listdir(cleaned_dir):
+        filepath = os.path.join(cleaned_dir, filename)
+        with open(filepath, 'r', encoding='utf-8') as file:
+            unique_words.update(tokenize_question(file.read()))
+    return unique_words
+
+def corpus_unique_words(cleaned_directory):
+    unique_words = set()
+    for filename in os.listdir(cleaned_directory):
+        if filename.endswith(".txt"):
+            with open(os.path.join(cleaned_directory, filename), 'r', encoding='utf-8') as file:
+                content = file.read()
+                unique_words.update(tokenize_question(content))
+    return unique_words
+
+
+def compute_question_tf_idf(question, idf_scores):
+    # Tokeniser la question
+    question_tokens = tokenize_question(question)
+    # Calculer la fréquence de chaque mot dans la question (TF)
+    tf_scores = {word: question_tokens.count(word) / len(question_tokens) for word in question_tokens}
+    # Calculer le vecteur TF-IDF pour la question en utilisant uniquement les mots de la question
+    question_tf_idf = {word: tf_scores[word] * idf_scores.get(word, 0) for word in question_tokens if word in idf_scores}
+    return question_tf_idf
+
+def produit_scalaire(vecteur_a, vecteur_b):
+    return sum(a * b for a, b in zip(vecteur_a, vecteur_b))
+
+def norme_vecteur(vecteur):
+    return math.sqrt(sum(a * a for a in vecteur))
+
+def similarite_cosinus(vecteur_a, vecteur_b):
+    produit = sum(a * b for a, b in zip(vecteur_a, vecteur_b))
+    norme_a = math.sqrt(sum(a * a for a in vecteur_a))
+    norme_b = math.sqrt(sum(b * b for b in vecteur_b))
+    if norme_a == 0 or norme_b == 0:
+        return 0
+    return produit / (norme_a * norme_b)
+def calculer_vecteur_tf_idf_question(question, scores_idf, mots_uniques_corpus):
+    mots_question = tokenize_question(question)
+    tf_question = {mot: mots_question.count(mot) / len(mots_question) for mot in mots_uniques_corpus}
+    tf_idf_question = {mot: tf_question.get(mot, 0) * scores_idf.get(mot, 0) for mot in mots_uniques_corpus}
+    return tf_idf_question
+
+def calculer_similarite(tf_idf_matrix, vecteur_question):
+    scores_similarite = {}
+    for doc, vecteur_doc in tf_idf_matrix.items():
+        vecteur_doc_list = [vecteur_doc.get(mot, 0) for mot in vecteur_question]
+        scores_similarite[doc] = similarite_cosinus(vecteur_question.values(), vecteur_doc_list)
+    return scores_similarite
+
+def document_le_plus_pertinent(scores_similarite):
+    document_pertinent = max(scores_similarite, key=scores_similarite.get)
+    score_pertinent = scores_similarite[document_pertinent]
+    return document_pertinent, score_pertinent
+
+
+def mot_avec_tf_idf_le_plus_eleve(compute_question_tf_idf):
+    mot_max = ''
+    score_max = 0
+    for mot, score in compute_question_tf_idf.items():
+        if score > score_max:
+            score_max = score
+            mot_max = mot
+    return mot_max
+
+
+def premiere_occurrence_du_mot(document, mot):
+    full_path = os.path.join('C:/Users/antpe/OneDrive/Documents/GitHub/chatbot/src/cleaned', document)
+    if os.path.exists(full_path):
+        try:
+            with open(document, 'r', encoding='utf-8') as fichier:
+                texte = fichier.read().lower()
+                texte = texte.translate(str.maketrans('', '', string.punctuation))
+                mots = texte.split()
+                index = mots.index(mot)
+                debut = max(index - 15, 0)
+                fin = min(index + 15, len(mots))
+                return ' '.join(mots[debut:fin])
+        except ValueError:
+            return ""
+    else:
+        return "Le fichier n'existe pas."
+
+    # Supprimer la ponctuation
+    for char in string.punctuation:
+        texte = texte.replace(char, ' ')
+
+    # Trouver la première occurrence du mot
+    mots = texte.split()
+    index = mots.index(mot) if mot in mots else -1
+    if index == -1:
+        return ""
+
+    # Reconstituer la phrase contenant le mot
+    debut = max(index - 15, 0)
+    fin = min(index + 15, len(mots))
+    return ' '.join(mots[debut:fin])
+
+
+def affiner_reponse(question, reponse_brute):
+    # Dictionnaire des débuts de réponse possibles selon le type de question
+    question_starters = {
+        "Comment": "Après analyse, ",
+        "Pourquoi": "Car, ",
+        "Peux-tu": "Oui, bien sûr! "
+    }
+
+    # Identifier le type de question pour choisir le bon début de réponse
+    for question_type, starter in question_starters.items():
+        if question.startswith(question_type):
+            # Ajouter le début de réponse et une majuscule en début de phrase
+            reponse_amelioree = starter + reponse_brute[0].upper() + reponse_brute[1:]
+            # Ajouter un point final si nécessaire
+            if not reponse_amelioree.strip().endswith('.'):
+                reponse_amelioree += '.'
+            return reponse_amelioree
+
+    # Si aucun type n'est reconnu, retourner la réponse brute avec une majuscule et un point
+    reponse_amelioree = reponse_brute[0].upper() + reponse_brute[1:]
+    if not reponse_amelioree.strip().endswith('.'):
+        reponse_amelioree += '.'
+    return reponse_amelioree
+
+
+def chatbot_reponse(question, cleaned_directory, idf_scores):
+    # Tokeniser et calculer le vecteur TF-IDF pour la question
+    cleaned_directory = 'C:/Users/antpe/OneDrive/Documents/GitHub/chatbot/src/cleaned'
+    vecteur_question = compute_question_tf_idf(question, idf_scores)
+
+    # Calculer les similarités de cosinus avec les documents du corpus
+    vocabulary, tf_idf_matrix = build_tf_idf_matrix(cleaned_directory)
+    scores_similarite = calculer_similarite(tf_idf_matrix, vecteur_question)
+
+    # Trouver le document le plus pertinent
+    document_pertinent, score_pertinent = document_le_plus_pertinent(scores_similarite)
+
+    # Trouver le mot avec le score TF-IDF le plus élevé dans la question
+    mot_important = mot_avec_tf_idf_le_plus_eleve(vecteur_question)
+
+    # Trouver la phrase contenant le mot important dans le document pertinent
+    phrase_contenant_mot_important = premiere_occurrence_du_mot(document_pertinent, mot_important)
+
+    # Affiner la réponse
+    reponse_affinee = affiner_reponse(question, phrase_contenant_mot_important)
+
+    return reponse_affinee
+
+
+
+
+
+
+
+
+
+
+
+
+
