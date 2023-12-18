@@ -2,6 +2,7 @@
 import functions
 import time
 import os
+
 cleaned_directory = 'C:/Users/antpe/OneDrive/Documents/GitHub/chatbot/src/cleaned'
 
 #|-----------------------------------------|
@@ -11,14 +12,14 @@ def afficher_menu():
     print("|----------------|")
     print("|    ChatBot     |")
     print("|----------------|")
-    time.sleep(1)
+    time.sleep(1.5)
     # Les différentes options pour les utilisateurs
     print("1. Afficher la liste des mots les moins importants")
     print("2. Afficher les mots ayant le score TF-IDF le plus élevé")
     print("3. Afficher les mots les plus répétés par le président Chirac")
     print("""4. Afficher les noms des présidents qui ont parlé de la "Nation" et de celui qui l'a répété le plus de fois""")
     print("5. Affiche le premier président à parler du climat et de l'écologie")
-    print("6. Affiche les mots que tous les présidents ont évoqués , /!\ : supprimé ")
+    print("6. Affiche les mots que tous les présidents ont évoqués /!\ : supprimé ")
     print("7. Posez une question à notre ChaBot")
     print("8. Quitter")
 
@@ -34,10 +35,10 @@ def option2():
     print("Le mot avec le score TF-IDF le plus élevé est :", highest_words, "avec un score de :", highest_score)
 
 def option3():
-    vocabulary, tf_idf_matrix = functions.build_tf_idf_matrix('C:/Users/antpe\OneDrive\Documents\GitHub\chatbot\src\cleaned')
+    vocabulary, tf_idf_matrix = functions.build_tf_idf_matrix('C:/Users/antpe/OneDrive/Documents\GitHub\chatbot\src\cleaned')
     least_important_words = functions.find_least_important_words(tf_idf_matrix)
     most_repeated_word, most_repeated_count = functions.find_most_repeated_words_by_chirac(tf_idf_matrix, least_important_words)
-    print("Les mot les plus répétés par le président Chirac est :", most_repeated_word, "avec une fréquence de :", most_repeated_count)
+    print("Les mot les plus répétés par le président Chirac sont :", most_repeated_word, "avec une fréquence de :", most_repeated_count)
 
 def option4():
 
@@ -50,11 +51,8 @@ def option4():
 
 def option5():
     cleaned_directory = 'C:/Users/antpe\OneDrive\Documents\GitHub\chatbot\src\cleaned'
-    first_president, speech_file = functions.find_first_mention_of_ecology_or_climate(cleaned_directory)
-    if first_president:
-        print(f"Le premier président à parler du climat ou de l'écologie est {first_president} dans le fichier {speech_file}.")
-    else:
-        print("Aucune mention du climat ou de l'écologie trouvée dans les discours.")
+    president_mentions = functions.find_all_mentions_of_ecology_or_climate(cleaned_directory)
+    print(president_mentions)
 
 def option6():
     vocabulary, tf_idf_matrix = functions.build_tf_idf_matrix('C:/Users/antpe\OneDrive\Documents\GitHub\chatbot\src\cleaned')
@@ -141,19 +139,17 @@ tokens = functions.tokenize_question("Je suis un ChatBot performant")
 print(tokens)
 
 cleaned_dir = 'C:/Users/antpe\OneDrive\Documents\GitHub\chatbot\src\cleaned'
-question = "Quel est l'impact de la politique environnementale sur l'économie ?"
+question = ""
 common_words = functions.find_question_words_in_corpus(question, cleaned_dir)
 print(common_words)
 
 
-question = "Quel est l'impact de la politique environnementale sur l'économie ?"
+question = ""
 question_tf_idf_vector = functions.compute_question_tf_idf(question, corpus_idf_scores, corpus_unique_words)
 
-# Afficher le vecteur TF-IDF pour la question
 print(question_tf_idf_vector)
 
 
-import os
 filename = 'Nomination_Hollande.txt'
 
 full_path = os.path.join('C:/Users/antpe/OneDrive/Documents/GitHub/chatbot/src/cleaned', filename)
@@ -167,22 +163,17 @@ question_tf_idf_vector = functions.compute_question_tf_idf(question, idf_scores)
 print(question_tf_idf_vector)
 
 
-
 cleaned_directory = 'C:/Users/antpe/OneDrive/Documents/GitHub/chatbot/src/cleaned'
-# Supposons que la question et les scores IDF sont déjà calculés...
-question = "Quel est l'impact de la politique environnementale sur l'économie ?"
-idf_scores = functions.idf(cleaned_directory)  # Assurez-vous que cette fonction renvoie le dictionnaire IDF correct
+question = ""
+idf_scores = functions.idf(cleaned_directory) 
 question_tf_idf = functions.compute_question_tf_idf(question, idf_scores)
 
-# Calcul de la similarité...
 vocabulary, tf_idf_matrix = functions.build_tf_idf_matrix(cleaned_directory)
 vecteur_question = functions.calculer_vecteur_tf_idf_question(question, idf_scores, vocabulary)
 scores_similarite = functions.calculer_similarite(tf_idf_matrix, vecteur_question)
 document_pertinent, score_pertinent = functions.document_le_plus_pertinent(scores_similarite)
 
-# Génération de la réponse...
 mot_important = functions.mot_avec_tf_idf_le_plus_eleve(question_tf_idf)
-phrase_contenant_mot_important = functions.premiere_occurrence_du_mot(os.path.join(cleaned_directory, document_pertinent), mot_important)
 
 print(f"Document pertinent: {document_pertinent}")
 print(f"Score de similarité: {score_pertinent}")
@@ -190,8 +181,8 @@ print(f"Mot important: {mot_important}")
 print(f"Phrase contenant le mot important: {phrase_contenant_mot_important}"
 
 
-question = "Peux-tu me dire comment une nation peut-elle prendre soin du climat ?"
-reponse_brute = "qu'il s'agisse de la crise migratoire, du défi climatique, des dérives autoritaires, des excès du capitalisme mondial, et bien sûr du terrorisme ; plus rien désormais ne frappe les uns en épargnant les autres"
+question = ""
+reponse_brute = ""
 reponse_affinee = functions.affiner_reponse(question, reponse_brute)
 
 print(reponse_affinee)

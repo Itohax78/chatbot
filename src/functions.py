@@ -246,8 +246,6 @@ def find_most_repeated_words_by_chirac(tf_idf_matrix, least_important_words):
     return most_repeated_words, max_frequency
 
 
-
-
 def find_presidents_mentions_of_nation(tf_idf_matrix):
     # Initialiser un dictionnaire pour compter les mentions de "nation" pour chaque président
     president_nation_mentions = {}
@@ -269,22 +267,31 @@ def find_presidents_mentions_of_nation(tf_idf_matrix):
 
 
 
-def find_first_mention_of_ecology_or_climate(cleaned_directory):
+def find_all_mentions_of_ecology_or_climate(cleaned_directory):
     # Liste des mots à rechercher
-    keywords = ['climat', 'écologie', 'environnement']
+    keywords = ['climat', 'écologie']
 
-    # Parcourir les fichiers dans l'ordre alphabétique, qui peut correspondre à l'ordre chronologique
-    for filename in sorted(os.listdir(cleaned_directory)):
+    # Dictionnaire pour stocker les présidents et les fichiers correspondants
+    president_mentions = {}
+
+    # Parcourir les fichiers
+    for filename in os.listdir(cleaned_directory):
         if filename.endswith('.txt'):
             with open(os.path.join(cleaned_directory, filename), 'r', encoding='utf-8') as file:
                 content = file.read().lower()
+
                 # Vérifier si l'un des mots-clés est mentionné dans le discours
                 if any(keyword in content for keyword in keywords):
                     # Extraire le nom du président du nom du fichier
                     president_name = filename.replace('Nomination_', '').replace('.txt', '').split('_')[0]
-                    return president_name, filename
 
-    return None, None
+                    # Ajouter le nom du président et le fichier à la liste
+                    if president_name not in president_mentions:
+                        president_mentions[president_name] = []
+                    president_mentions[president_name].append(filename)
+
+    return president_mentions
+
 
 def find_common_words_among_all_presidents(tf_idf_matrix, least_important_words):
     # Initialiser un ensemble avec tous les mots du premier document
