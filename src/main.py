@@ -7,7 +7,9 @@ chemin_speeches = input("Veuillez saisir le chemin d'accès du dossier speeches 
 
 chemin_cleaned = chemin_speeches.replace("speeches", "cleaned")
 
-#fonctions de base pour faire fonctionner le chatbot
+#|----------------------------------------|
+#|       Fonctions de base                |
+#|----------------------------------------|
 
 
 extraire_nom = functions.extraction()

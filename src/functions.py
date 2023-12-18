@@ -466,7 +466,7 @@ def chatbot_reponse(question, cleaned_directory, idf_scores):
     vecteur_question = compute_question_tf_idf(question, idf_scores)
 
     # Calculer les similarités de cosinus avec les documents du corpus
-    vocabulary, tf_idf_matrix = build_tf_idf_matrix(chemin_cleaned)
+    vocabulary, tf_idf_matrix = build_tf_idf_matrix(cleaned_directory)
     scores_similarite = calculer_similarite(tf_idf_matrix, vecteur_question)
 
     # Trouver le document le plus pertinent
