@@ -333,17 +333,26 @@ def tokenize_question(question_text):
 
 
 def get_unique_corpus_words(cleaned_dir):
-    unique_words = set()
+    unique_words = set()  #Création d'un ensemble vide pour stocker les mots uniques du corpus
+
+    # Parcours de tous les fichiers dans le répertoire cleaned_dir
     for filename in os.listdir(cleaned_dir):
         filepath = os.path.join(cleaned_dir, filename)
+
+        # Lecture du contenu du fichier et tokenisation des mots avec la fonction tokenize_question()
         with open(filepath, 'r', encoding='utf-8') as file:
             unique_words.update(tokenize_question(file.read()))
     return unique_words
 
 def corpus_unique_words(cleaned_directory):
-    unique_words = set()
+    unique_words = set() # Création d'un ensemble vide pour stocker les mots uniques du corpus
+
+    # Parcours de tous les fichiers dans le répertoire cleaned_dir
     for filename in os.listdir(cleaned_directory):
+
+        # Vérification si le fichier est un .txt
         if filename.endswith(".txt"):
+            # Lecture du contenu du fichier et tokenisation des mots avec la fonction tokenize_question()
             with open(os.path.join(cleaned_directory, filename), 'r', encoding='utf-8') as file:
                 content = file.read()
                 unique_words.update(tokenize_question(content))
@@ -359,40 +368,71 @@ def compute_question_tf_idf(question, idf_scores):
     question_tf_idf = {word: tf_scores[word] * idf_scores.get(word, 0) for word in question_tokens if word in idf_scores}
     return question_tf_idf
 
+# Permet de faire un produit scalaire
 def produit_scalaire(vecteur_a, vecteur_b):
     return sum(a * b for a, b in zip(vecteur_a, vecteur_b))
 
+# Permet de calculer la norme du vecteyr
 def norme_vecteur(vecteur):
     return math.sqrt(sum(a * a for a in vecteur))
 
+# Permet de calculer la similarité entre deux vecteurs
 def similarite_cosinus(vecteur_a, vecteur_b):
+
+    # Produit scalaire
     produit = sum(a * b for a, b in zip(vecteur_a, vecteur_b))
+
+    # norme de a et b
     norme_a = math.sqrt(sum(a * a for a in vecteur_a))
     norme_b = math.sqrt(sum(b * b for b in vecteur_b))
+
+    # Permet d'éviter une division par 0
     if norme_a == 0 or norme_b == 0:
         return 0
     return produit / (norme_a * norme_b)
+
+# Permet de calculer le vecteur TF-IDF d'une question
 def calculer_vecteur_tf_idf_question(question, scores_idf, mots_uniques_corpus):
+
+    # Permet de tokeniser la question
     mots_question = tokenize_question(question)
+
+    # Calcul TF de chaque mot
     tf_question = {mot: mots_question.count(mot) / len(mots_question) for mot in mots_uniques_corpus}
+
+    # Calcul TF-IDF de chaque mot
     tf_idf_question = {mot: tf_question.get(mot, 0) * scores_idf.get(mot, 0) for mot in mots_uniques_corpus}
     return tf_idf_question
 
+# Permet de calculer les scores de similarité entre un vecteur question et une matrice TF-IDF.
 def calculer_similarite(tf_idf_matrix, vecteur_question):
+
+    # Dictionnaire pour stocker les scores de similarité
     scores_similarite = {}
+
+    # Parcours de la matrice TF-IDF contenant les vecteurs pour chaque document
     for doc, vecteur_doc in tf_idf_matrix.items():
+
+        # Création d'une liste de valeurs (vecteur_doc) <=  mots du vecteur_question
         vecteur_doc_list = [vecteur_doc.get(mot, 0) for mot in vecteur_question]
+
+        # Calcul de la similarité entre le vecteur question et le vecteur du document actuel
         scores_similarite[doc] = similarite_cosinus(vecteur_question.values(), vecteur_doc_list)
     return scores_similarite
 
+# Permet de trouver le document le plus pertinent du score
 def document_le_plus_pertinent(scores_similarite):
+
+    # Identification du document le plus pertinent
     document_pertinent = max(scores_similarite, key=scores_similarite.get)
+
+    # Récupération du score de similarité
     score_pertinent = scores_similarite[document_pertinent]
     return document_pertinent, score_pertinent
 
-
+# Permet de trouver le mot avec le TF-IDF le plus élevé
 def mot_avec_tf_idf_le_plus_eleve(compute_question_tf_idf):
-    mot_max = ''
+    mot_max = '' # variable pour stocker le mot avec TF-IDF le plus élevé
     score_max = 0
     for mot, score in compute_question_tf_idf.items():
         if score > score_max:
