@@ -433,27 +433,36 @@ def document_le_plus_pertinent(scores_similarite):
 # Permet de trouver le mot avec le TF-IDF le plus élevé
 def mot_avec_tf_idf_le_plus_eleve(compute_question_tf_idf):
     mot_max = '' # variable pour stocker le mot avec TF-IDF le plus élevé
-    score_max = 0
+    score_max = 0 # Initialisation du score max pour déterminer une supériorité
+
+    #p Parcours du dictionnaire
     for mot, score in compute_question_tf_idf.items():
+
+        # Vérification du score le plus élevé
         if score > score_max:
             score_max = score
             mot_max = mot
     return mot_max
 
-
+# Permet de trouver la première occurence d'un mot dans un document
 def premiere_occurrence_du_mot(document, mot, cleaned_directory):
-    full_path = os.path.join(cleaned_directory, document)
-    if os.path.exists(full_path):
+    full_path = os.path.join(cleaned_directory, document) #Accès complet
+    if os.path.exists(full_path): #Vérification
         try:
             with open(full_path, 'r', encoding='utf-8') as fichier:
+
+                #traitement du texte pour le transformer en mot
                 texte = fichier.read().lower()
                 texte = texte.translate(str.maketrans('', '', string.punctuation))
                 mots = texte.split()
-                if mot in mots:
+
+                if mot in mots: # Vérification si existe
+
+                    # traitement de l'index des occurences
                     index = mots.index(mot)
                     debut = max(index - 15, 0)
                     fin = min(index + 15, len(mots))
-                    return ' '.join(mots[debut:fin])
+                    return ' '.join(mots[debut:fin]) # ajout du contexte
         except ValueError:
             return "Le mot n'a pas été trouvé dans le document."
     else:
