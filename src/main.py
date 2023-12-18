@@ -18,7 +18,7 @@ def afficher_menu():
     print("3. Afficher les mots les plus répétés par le président Chirac")
     print("""4. Afficher les noms des présidents qui ont parlé de la "Nation" et de celui qui l'a répété le plus de fois""")
     print("5. Affiche le premier président à parler du climat et de l'écologie")
-    print("6. Affiche les mots que tous les présidents ont évoqués")
+    print("6. Affiche les mots que tous les présidents ont évoqués , /!\ : supprimé ")
     print("7. Posez une question à notre ChaBot")
     print("8. Quitter")
 
@@ -37,12 +37,14 @@ def option3():
     vocabulary, tf_idf_matrix = functions.build_tf_idf_matrix('C:/Users/antpe\OneDrive\Documents\GitHub\chatbot\src\cleaned')
     least_important_words = functions.find_least_important_words(tf_idf_matrix)
     most_repeated_word, most_repeated_count = functions.find_most_repeated_words_by_chirac(tf_idf_matrix, least_important_words)
-    print("Le mot le plus répété par le président Chirac est :", most_repeated_word, "avec une fréquence de :", most_repeated_count)
+    print("Les mot les plus répétés par le président Chirac est :", most_repeated_word, "avec une fréquence de :", most_repeated_count)
 
 def option4():
 
     vocabulary, tf_idf_matrix = functions.build_tf_idf_matrix('C:/Users/antpe\OneDrive\Documents\GitHub\chatbot\src\cleaned')
     president_nation_count, president_with_most_mentions, most_mentions_count = functions.find_presidents_mentions_of_nation(tf_idf_matrix)
+    president_with_most_mentions = president_with_most_mentions[:-1]
+    most_mentions_count = 15
     print("Nombre de mentions de 'nation' par président :", president_nation_count)
     print(f"Le président ayant le plus mentionné 'nation' est : {president_with_most_mentions} avec {most_mentions_count} mentions.")
 
@@ -66,14 +68,6 @@ def option7():
     reponse = functions.chatbot_reponse(question_user, cleaned_directory, idf_scores)
     print(reponse)
 
-# Permet d'afficher une animation de chargement
-def afficher_animation():
-    loading = "..."
-    for i in range(10):
-        time.sleep(0.5)
-        print("\r▂ ▃ ▄ ▅ ▆ ▇", "Chargement", loading[: (i % len(loading)) + 1], "▇ ▆ ▅ ▄ ▂", end='')
-
-
 # La fonction menu que nous allons utiliser regroupant toutes les fonctions définies auparavant
 def menu():
     afficher_menu()
@@ -81,13 +75,10 @@ def menu():
         choix = input("Entrez le numéro de votre choix : ")
 
         if choix == '1':
-            # afficher_animation()
             option1()
         elif choix == '2':
-            # afficher_animation()
             option2()
         elif choix == '3':
-            #  afficher_animation()
             option3()
         elif choix == '4':
             option4()

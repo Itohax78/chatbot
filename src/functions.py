@@ -230,20 +230,21 @@ def find_highest_tf_idf_words(tf_idf_matrix):
 def find_most_repeated_words_by_chirac(tf_idf_matrix, least_important_words):
     word_frequency = {}
 
+    # Parcourir les documents et compter la fréquence des mots pour les discours de Chirac
     for filename, doc_scores in tf_idf_matrix.items():
-        # Vérifiez si le fichier est l'un des discours de Chirac
-        if 'Nomination_Chirac1.txt' in filename or 'Nomination_Chirac2.txt' in filename:
+        if 'Chirac' in filename:  # Simplification pour l'exemple
             for word, score in doc_scores.items():
                 if word not in least_important_words:
-                    if word not in word_frequency:
-                        word_frequency[word] = 0
-                    word_frequency[word] += 1  # Incrementer la fréquence du mot
+                    word_frequency[word] = word_frequency.get(word, 0) + 1
 
-    # Trouver le mot le plus répété
-    most_repeated_word = max(word_frequency, key=word_frequency.get, default=None)
-    most_repeated_count = word_frequency.get(most_repeated_word, 0)
+    # Trouver la fréquence la plus élevée
+    max_frequency = max(word_frequency.values(), default=0)
 
-    return most_repeated_word, most_repeated_count
+    # Trouver tous les mots qui ont la fréquence la plus élevée
+    most_repeated_words = [word for word, frequency in word_frequency.items() if frequency == max_frequency]
+
+    return most_repeated_words, max_frequency
+
 
 
 
@@ -265,6 +266,8 @@ def find_presidents_mentions_of_nation(tf_idf_matrix):
     most_mentions_count = president_nation_mentions[most_mentions]
 
     return president_nation_mentions, most_mentions, most_mentions_count
+
+
 
 def find_first_mention_of_ecology_or_climate(cleaned_directory):
     # Liste des mots à rechercher
@@ -390,22 +393,24 @@ def mot_avec_tf_idf_le_plus_eleve(compute_question_tf_idf):
     return mot_max
 
 
-def premiere_occurrence_du_mot(document, mot):
-    full_path = os.path.join('C:/Users/antpe/OneDrive/Documents/GitHub/chatbot/src/cleaned', document)
+def premiere_occurrence_du_mot(document, mot, cleaned_directory):
+    full_path = os.path.join(cleaned_directory, document)
     if os.path.exists(full_path):
         try:
-            with open(document, 'r', encoding='utf-8') as fichier:
+            with open(full_path, 'r', encoding='utf-8') as fichier:
                 texte = fichier.read().lower()
                 texte = texte.translate(str.maketrans('', '', string.punctuation))
                 mots = texte.split()
-                index = mots.index(mot)
-                debut = max(index - 15, 0)
-                fin = min(index + 15, len(mots))
-                return ' '.join(mots[debut:fin])
+                if mot in mots:
+                    index = mots.index(mot)
+                    debut = max(index - 15, 0)
+                    fin = min(index + 15, len(mots))
+                    return ' '.join(mots[debut:fin])
         except ValueError:
-            return ""
+            return "Le mot n'a pas été trouvé dans le document."
     else:
         return "Le fichier n'existe pas."
+
 
     # Supprimer la ponctuation
     for char in string.punctuation:
@@ -464,7 +469,7 @@ def chatbot_reponse(question, cleaned_directory, idf_scores):
     mot_important = mot_avec_tf_idf_le_plus_eleve(vecteur_question)
 
     # Trouver la phrase contenant le mot important dans le document pertinent
-    phrase_contenant_mot_important = premiere_occurrence_du_mot(document_pertinent, mot_important)
+    phrase_contenant_mot_important = premiere_occurrence_du_mot(document_pertinent, mot_important, cleaned_directory)
 
     # Affiner la réponse
     reponse_affinee = affiner_reponse(question, phrase_contenant_mot_important)
