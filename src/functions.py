@@ -9,6 +9,7 @@ import collections
 #|       PARTIE 1                         |
 #|----------------------------------------|
 
+#Parcourir le dossier pour trouver les noms
 def list_of_files(directory, extension):
    files_names = []
    for filename in os.listdir(directory):
@@ -462,11 +463,10 @@ def affiner_reponse(question, reponse_brute):
 
 def chatbot_reponse(question, cleaned_directory, idf_scores):
     # Tokeniser et calculer le vecteur TF-IDF pour la question
-    cleaned_directory = 'C:/Users/antpe/OneDrive/Documents/GitHub/chatbot/src/cleaned'
     vecteur_question = compute_question_tf_idf(question, idf_scores)
 
     # Calculer les similarités de cosinus avec les documents du corpus
-    vocabulary, tf_idf_matrix = build_tf_idf_matrix(cleaned_directory)
+    vocabulary, tf_idf_matrix = build_tf_idf_matrix(chemin_cleaned)
     scores_similarite = calculer_similarite(tf_idf_matrix, vecteur_question)
 
     # Trouver le document le plus pertinent
