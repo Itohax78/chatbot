@@ -49,7 +49,7 @@ def duplicate_filter(name_presidents):
     return (noduplicate)
 
 
-#Associer à chaque président un prénom
+#Associer à chaque président son prénom
 def first_name(name_presidents):
     prenom = [ ]
     prenom_nom = []
