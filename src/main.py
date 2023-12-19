@@ -12,20 +12,7 @@ chemin_cleaned = chemin_speeches.replace("speeches", "cleaned")
 #|----------------------------------------|
 
 
-extraire_nom = functions.extraction()
-print(extraire_nom)
 
-name = functions.president(functions.list_of_files("speeches", ".txt"))
-print(name)
-
-number = functions.cancel_number(name)
-print(number)
-
-noduplicate = functions.duplicate_filter(number)
-print(noduplicate)
-
-prenom = functions.first_name(noduplicate)
-print(prenom)
 
 functions.directory_exist(chemin_speeches)
 
@@ -130,7 +117,23 @@ menu()
 #|----------------------------------------|
 
 
+'''extraire_nom = functions.extraction()
+print(extraire_nom)
+
+name = functions.president(functions.list_of_files("speeches", ".txt"))
+print(name)
+
+number = functions.cancel_number(name)
+print(number)
+
+noduplicate = functions.duplicate_filter(number)
+print(noduplicate)
+
+prenom = functions.first_name(noduplicate)
+print(prenom)
+
 functions.store_files("cleaned", ".txt")
+
 
 functions.remove_punctuation_character()
 
@@ -193,4 +196,4 @@ question = ""
 reponse_brute = ""
 reponse_affinee = functions.affiner_reponse(question, reponse_brute)
 
-print(reponse_affinee)
+print(reponse_affinee)'''
