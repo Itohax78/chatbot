@@ -1,4 +1,7 @@
-# chatbot$
+# chatbot
+
+! ATTENTION ! : Avant d'utiliser les fonctionnalités du programme, vérifier bien que le chemin d'accès que vous entrer est le chemin d'accès du dossier speeches
+
 fait par Antoine P. et Emmanuel R.
 
 réalisation d'un chatbot à partir de documents des nominations des présidents : 
